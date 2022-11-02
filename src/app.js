@@ -1,14 +1,9 @@
 const express = require("express")
 const fs = require("fs")
 const path = require("path")
+const { writeJSON, users, accounts } = require("./data")
 
 const app = express();
-
-const accountData = fs.readFileSync("src/json/accounts.json", { 'encoding': 'utf8' })
-const accounts = JSON.parse(accountData)
-
-const userData = fs.readFileSync("src/json/users.json", { 'encoding': 'utf8' })
-const users = JSON.parse(userData)
 
 app.set("views", path.join(__dirname, "views"))
 app.set("view engine", "ejs")
@@ -46,8 +41,7 @@ app.get("/transfer", (req, res) => {
     accounts[from].balance -= parseInt(amount);
     accounts[to].balance += parseInt(amount);
 
-    let accountsJSON = JSON.stringify(accounts)
-    fs.writeFileSync(path.join(__dirname, "json/accounts.json"), accountsJSON, 'utf8')
+    writeJSON(accounts)
 
     res.render("transfer", { message: "Transfer Completed" })
 })
@@ -59,8 +53,7 @@ app.get("/payment", (req, res) => {
     accounts.credit.balance -= parseInt(amount)
     accounts.credit.available += parseInt(amount)
 
-    let accountsJSON = JSON.stringify(accounts)
-    fs.writeFileSync(path.join(__dirname, "json/accounts.json"), accountsJSON, 'utf8')
+    writeJSON(accounts)
 
     res.render("payment", { "message": "Payment Successful", 'account': accounts.credit })
 })
