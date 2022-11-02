@@ -14,6 +14,7 @@ app.set("views", path.join(__dirname, "views"))
 app.set("view engine", "ejs")
 
 app.use(express.static(path.join(__dirname, "public")))
+app.use(express.urlencoded({ extended: true }))
 
 app.get("/", (req, res) => {
     res.render("index", { 'title': 'Account Summary', 'accounts': accounts })
@@ -33,6 +34,35 @@ app.get("/credit", (req, res) => {
 
 app.get("/profile", (req, res) => {
     res.render("profile", { 'user': users[0] })
+})
+
+app.get("/transfer", (req, res) => {
+    res.render("transfer")
+}).post("/transfer", (req, res) => {
+    let { from, to, amount } = req.body
+    if (accounts[from].balance < amount) {
+        res.render("transfer", { "message": "Insuffient fund" })
+    }
+    accounts[from].balance -= parseInt(amount);
+    accounts[to].balance += parseInt(amount);
+
+    let accountsJSON = JSON.stringify(accounts)
+    fs.writeFileSync(path.join(__dirname, "json/accounts.json"), accountsJSON, 'utf8')
+
+    res.render("transfer", { message: "Transfer Completed" })
+})
+
+app.get("/payment", (req, res) => {
+    res.render("payment", { account: accounts.credit })
+}).post("/payment", (req, res) => {
+    let { amount } = req.body
+    accounts.credit.balance -= parseInt(amount)
+    accounts.credit.available += parseInt(amount)
+
+    let accountsJSON = JSON.stringify(accounts)
+    fs.writeFileSync(path.join(__dirname, "json/accounts.json"), accountsJSON, 'utf8')
+
+    res.render("payment", { "message": "Payment Successful", 'account': accounts.credit })
 })
 
 
