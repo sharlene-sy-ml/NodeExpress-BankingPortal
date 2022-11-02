@@ -41,7 +41,7 @@ app.get("/transfer", (req, res) => {
     accounts[from].balance -= parseInt(amount);
     accounts[to].balance += parseInt(amount);
 
-    writeJSON(accounts)
+    writeJSON()
 
     res.render("transfer", { message: "Transfer Completed" })
 })
@@ -53,7 +53,7 @@ app.get("/payment", (req, res) => {
     accounts.credit.balance -= parseInt(amount)
     accounts.credit.available += parseInt(amount)
 
-    writeJSON(accounts)
+    writeJSON()
 
     res.render("payment", { "message": "Payment Successful", 'account': accounts.credit })
 })
